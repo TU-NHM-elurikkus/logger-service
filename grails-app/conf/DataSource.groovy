@@ -4,16 +4,17 @@ dataSource {
     driverClassName = "com.mysql.jdbc.Driver"
     username = "logger_user"
     password = "logger_user"
-    dialect = org.hibernate.dialect.MySQL5Dialect
+    dialect = org.hibernate.dialect.MySQL5InnoDBDialect
     properties {
         maxActive = -1
-        minEvictableIdleTimeMillis=1800000
-        timeBetweenEvictionRunsMillis=1800000
-        numTestsPerEvictionRun=3
-        testOnBorrow=true
-        testWhileIdle=true
-        testOnReturn=true
-        validationQuery="SELECT 1"
+        minEvictableIdleTimeMillis = 1800000
+        timeBetweenEvictionRunsMillis = 1800000
+        maxWait = 10000
+        numTestsPerEvictionRun = 3
+        testOnBorrow = true
+        testWhileIdle = true
+        testOnReturn = true
+        validationQuery = ""
     }
 }
 hibernate {
