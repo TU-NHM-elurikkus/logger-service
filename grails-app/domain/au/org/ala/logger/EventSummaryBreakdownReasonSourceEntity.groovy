@@ -26,7 +26,7 @@ class EventSummaryBreakdownReasonSourceEntity implements Serializable {
     }
 
     static mapping = {
-        table "event_summary_breakdown_reason_source_entity"
+        table "event_summary_breakdown_reason_entity_source"
         version false
 
         id generator: "assigned", composite: ["month", "logEventTypeId", "logReasonTypeId", "entityUid"]
