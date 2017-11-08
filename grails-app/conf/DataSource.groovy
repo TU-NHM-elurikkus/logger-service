@@ -30,7 +30,7 @@ environments {
 
     development {
         dataSource {
-            dbCreate = "validate" // one of 'create', 'create-drop', 'update', 'validate', ''
+            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:mysql://localhost:3306/logger"
             driverClassName = "com.mysql.jdbc.Driver"
             username = "logger_user"
@@ -46,7 +46,6 @@ environments {
     }
     production {
         dataSource {
-            dbCreate = "validate"
             // defined in external configuration file
         }
     }
