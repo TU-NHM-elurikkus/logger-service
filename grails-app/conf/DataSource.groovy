@@ -1,9 +1,20 @@
 dataSource {
     pooled = true
     jmxExport = true
-    driverClassName = "org.h2.Driver"
-    username = "sa"
-    password = ""
+    driverClassName = "com.mysql.jdbc.Driver"
+    username = "logger_user"
+    password = "logger_user"
+    dialect = org.hibernate.dialect.MySQL5Dialect
+    properties {
+        maxActive = -1
+        minEvictableIdleTimeMillis=1800000
+        timeBetweenEvictionRunsMillis=1800000
+        numTestsPerEvictionRun=3
+        testOnBorrow=true
+        testWhileIdle=true
+        testOnReturn=true
+        validationQuery="SELECT 1"
+    }
 }
 hibernate {
     cache.use_second_level_cache = false
@@ -19,7 +30,7 @@ environments {
     development {
         dataSource {
             dbCreate = "validate" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost/logger"
+            url = "jdbc:mysql://localhost:3306/logger"
             driverClassName = "com.mysql.jdbc.Driver"
             username = "logger_user"
             password = "logger_user"

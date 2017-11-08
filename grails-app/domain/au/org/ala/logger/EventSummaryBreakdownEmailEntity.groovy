@@ -9,7 +9,7 @@ class EventSummaryBreakdownEmailEntity implements Serializable {
     String month
     Integer logEventTypeId
     String userEmailCategory
-    String entityUid;
+    String entityUid
     Long numberOfEvents
     Long recordCount
 

@@ -6,8 +6,7 @@ grailsw
 grailsw.bat
 .classpath
 .project
-*.iml
-
+.DS_Store
 *.iml
 
 logger-service-grailsPlugins.iml

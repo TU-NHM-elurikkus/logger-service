@@ -18,6 +18,11 @@ class IpAddressFilters {
             before = {
                 String ip = request.getHeader(X_FORWARDED_FOR) ?: request.getRemoteAddr()
 
+                if (ip && ip.startsWith("::ffff:")) {
+                    // workaround for nginx ip prefix shittery
+                    ip = ip.substring(7)
+                }
+
                 if (!loggerService.findRemoteAddress(ip)) {
                     log.error("Unrecognised ip address ${ip}")
                     response.setStatus(HttpStatus.UNAUTHORIZED.value)

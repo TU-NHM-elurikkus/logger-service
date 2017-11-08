@@ -1,30 +1,50 @@
-import org.apache.log4j.Level
+import grails.util.Environment
+import com.nextdoor.rollbar.RollbarLog4jAppender
+
+grails.project.groupId = "au.org.ala" // change this to alter the default package name and Maven publishing destination
 
 /******************************************************************************\
  *  CONFIG MANAGEMENT
  \******************************************************************************/
 
 def appName = 'logger'
-def ENV_NAME = "${appName.toUpperCase()}_CONFIG"
+
 default_config = "/data/${appName}/config/${appName}-config.properties"
-if(!grails.config.locations || !(grails.config.locations instanceof List)) {
-    grails.config.locations = []
+commons_config = "/data/commons/config/commons-config.properties"
+env_config = "conf/${Environment.current.name}/Config.groovy"
+
+grails.config.locations = [
+    "file:${env_config}",
+    "file:${commons_config}",
+    "file:${default_config}"
+]
+
+def prop = new Properties()
+def rollbarServerKey = ""
+
+// Load rollbar key from commons config file.
+try {
+    File fileLocation = new File(commons_config)
+    prop.load(new FileInputStream(fileLocation))
+    rollbarServerKey = prop.getProperty("rollbar.postServerKey") ?: ""
+} catch(IOException e) {
+    e.printStackTrace()
 }
-if(System.getenv(ENV_NAME) && new File(System.getenv(ENV_NAME)).exists()) {
-    println "[${appName}] Including configuration file specified in environment: " + System.getenv(ENV_NAME);
-    grails.config.locations.add "file:" + System.getenv(ENV_NAME)
-} else if(System.getProperty(ENV_NAME) && new File(System.getProperty(ENV_NAME)).exists()) {
-    println "[${appName}] Including configuration file specified on command line: " + System.getProperty(ENV_NAME);
-    grails.config.locations.add "file:" + System.getProperty(ENV_NAME)
-} else if(new File(default_config).exists()) {
-    println "[${appName}] Including default configuration file: " + default_config;
-    grails.config.locations.add "file:" + default_config
-} else {
-    println "[${appName}] No external configuration file defined."
+
+if(!new File(env_config).exists()) {
+    println "ERROR - [${appName}] Couldn't find environment specific configuration file: ${env_config}"
+}
+if(!new File(default_config).exists()) {
+    println "ERROR - [${appName}] No external configuration file defined. ${default_config}"
+}
+if(!new File(commons_config).exists()) {
+    println "ERROR - [${appName}] No external commons configuration file defined. ${commons_config}"
+}
+if(rollbarServerKey.isEmpty()) {
+    println "ERROR - [${appName}] No Rollbar key."
 }
 
 println "[${appName}] (*) grails.config.locations = ${grails.config.locations}"
-grails.project.groupId = "au.org.ala" // change this to alter the default package name and Maven publishing destination
 
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
@@ -93,11 +113,11 @@ grails.exceptionresolver.params.exclude = ['password']
 grails.hibernate.cache.queries = false
 
 // configure mail settings
-grails.mail.host = "smtp.csiro.au"
-grails.mail.default.from = "support@ala.org.au"
+grails.mail.host = "smtp.elurikkus.ut.ee"
+grails.mail.default.from = "support@elurikkus.ut.ee"
 
 // url for collectory for user reports
-collectoryUrl = "https://collections.ala.org.au"
+collectoryUrl = "https://demo.elurikkus.ut.ee/collectory"
 
 // configure passing transaction's read-only attribute to Hibernate session, queries and criterias
 // set "singleSession = false" OSIV mode in hibernate configuration after enabling
@@ -116,36 +136,62 @@ environments {
 }
 
 // log4j configuration
-def loggingDir = (System.getProperty('catalina.base') ? System.getProperty('catalina.base') + '/logs' : './logs')
+def logging_dir = System.getProperty("catalina.base") ? System.getProperty("catalina.base") + "/logs" : "/var/log/tomcat7"
+if(!new File(logging_dir).exists()) {
+    logging_dir = "/tmp"
+}
+
+println "INFO - [${appName}] logging_dir: ${logging_dir}"
 
 log4j = {
+    def logPattern = pattern(conversionPattern: "%d %-5p [%c{1}] %m%n")
+
+    def rollbarAppender = new RollbarLog4jAppender(
+        name: "rollbar",
+        layout: logPattern,
+        threshold: org.apache.log4j.Level.ERROR,
+        environment: Environment.current.name,
+        accessToken: rollbarServerKey
+    )
+
+    def tomcatLogAppender = rollingFile(
+        name: "tomcatLog",
+        maxFileSize: "10MB",
+        file: "${logging_dir}/${appName}.log",
+        threshold: org.apache.log4j.Level.WARN,
+        layout: logPattern
+    )
+
     appenders {
         environments {
             production {
-                println "Log4j logs will be written to : ${loggingDir}"
-                rollingFile name: "tomcatLog", maxFileSize: '1MB', file: "${loggingDir}/${appName}.log", threshold: Level.ERROR, layout: pattern(conversionPattern: "%d %-5p [%c{1}] %m%n")
-            }
-            development {
-                console name: "stdout", layout: pattern(conversionPattern: "%d %-5p [%c{1}] %m%n"), threshold: Level.DEBUG
+                appender(tomcatLogAppender)
+                appender(rollbarAppender)
             }
             test {
-                println "Log4j logs will be written to : ${loggingDir}"
-                rollingFile name: "tomcatLog", maxFileSize: '1MB', file: "/tmp/${appName}", threshold: Level.DEBUG, layout: pattern(conversionPattern: "%d %-5p [%c{1}] %m%n")
+                appender(tomcatLogAppender)
+                appender(rollbarAppender)
+            }
+            development {
+                console(
+                    name: "stdout",
+                    layout: logPattern,
+                    threshold: org.apache.log4j.Level.DEBUG)
             }
         }
     }
     root {
         // change the root logger to my tomcatLog file
-        error 'tomcatLog'
+        error "tomcatLog", "rollbar"
         warn 'tomcatLog'
         additivity = true
     }
 
     debug 'grails.app',
-            'grails.app.domain',
-            'grails.app.controller',
-            'grails.app.service',
-            'grails.app.tagLib',
-            'au.org.ala.logger',
-            'grails.app.jobs'
+          'grails.app.domain',
+          'grails.app.controller',
+          'grails.app.service',
+          'grails.app.tagLib',
+          'au.org.ala.logger',
+          'grails.app.jobs'
 }
