@@ -2,6 +2,8 @@ class UrlMappings {
 
     static mappings = {
 
+        "/$controller/$action?/$id?"()
+
         "/service/logger"(controller: "logger", action: [POST: "save"])
         "/service/logger/"(controller: "logger", action: [POST: "save"])
 
@@ -31,16 +33,11 @@ class UrlMappings {
         "/service/$entityUid/events/$eventId/counts.json"(controller: "logger", action: [GET: "getEntityBreakdown"])
         "/service/$entityUid/events/$eventId/counts"(controller: "logger", action: [GET: "getEntityBreakdown"])
 
-        "/service/userBreakdown"(controller: "logger",  action: [GET: "getUserBreakdownCSV"])
+        "/service/userBreakdown"(controller: "logger", action: [GET: "getUserBreakdownCSV"])
 
-        "/logger/notAuthorised"(controller: "logger",  action: [GET: "notAuthorised"])
+        "/logger/notAuthorised"(controller: "logger", action: [GET: "notAuthorised"])
 
         "/service/userBreakdown"(resource: "logger", includes: ["userBreakdown"])
-
-
-        "500"(view: '/error')
-
-        "/"(view: "/index", controller: "logger")
 
         // admin screens
         "/admin/"(view: "/admin/admin", controller: "admin")
@@ -57,16 +54,12 @@ class UrlMappings {
         "/admin/eventSummaryTotal/$action?/$id?"(controller: "eventSummaryTotal")
 
         "/admin/userReport"(controller: "userReport")
-        "/admin/userReport/download"(controller: "userReport", action:"download")
-        "/admin/userReport/downloadDetailed"(controller: "userReport", action:"downloadDetailed")
-        "/service/admin/userReport/download"(controller: "userReport", action:"download")
-        "/service/admin/userReport/downloadDetailed"(controller: "userReport", action:"downloadDetailed")
+        "/admin/userReport/download"(controller: "userReport", action: "download")
+        "/admin/userReport/downloadDetailed"(controller: "userReport", action: "downloadDetailed")
+        "/service/admin/userReport/download"(controller: "userReport", action: "download")
+        "/service/admin/userReport/downloadDetailed"(controller: "userReport", action: "downloadDetailed")
 
-
-        "/logout/$action?/$id?"(controller:'logout'){
-            constraints {
-                // apply constraints here
-            }
-        }
+        "/"(view: "/index", controller: "logger")
+        "500"(view: "/error")
     }
 }
