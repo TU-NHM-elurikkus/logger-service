@@ -3,8 +3,8 @@ grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 grails.project.work.dir = "target/work"
-grails.project.target.level = 1.6
-grails.project.source.level = 1.6
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.project.fork = [
@@ -55,15 +55,12 @@ grails.project.dependency.resolution = {
         compile ":cache:1.1.8"
         compile ":csv:0.3.1"
         compile ":jsonp:0.2"
+        compile ":shiro:1.2.1"  // Authentication/permissions support for endpoints
+        compile ":elurikkus-commons:0.2-SNAPSHOT"
 
         // plugins needed at runtime but not for compilation
-        runtime ":ala-bootstrap2:2.7.0"
-        runtime (":ala-auth:2.1.4") {
-            exclude "servlet-api"
-        }
         runtime ":hibernate4:4.3.5.5"
         runtime ":database-migration:1.4.0"
-        compile ":elurikkus-commons:0.2-SNAPSHOT"
         runtime ":jquery:1.11.1"
     }
 }
