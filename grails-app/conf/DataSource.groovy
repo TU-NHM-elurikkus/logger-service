@@ -16,7 +16,7 @@ dataSource {
         testOnBorrow = true
         testWhileIdle = true
         testOnReturn = true
-        validationQuery = ""
+        validationQuery = "/* ping */"  // Better than "SELECT 1"
     }
 }
 
