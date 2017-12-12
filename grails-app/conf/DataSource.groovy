@@ -8,6 +8,8 @@ dataSource {
     dbCreate = "update" // one of "create", "create-drop", "update", "validate", ""
     url = "jdbc:mysql://localhost:3306/logger"
     properties {
+        jmxEnabled = true
+
         maxActive = -1
         minEvictableIdleTimeMillis = 1800000
         timeBetweenEvictionRunsMillis = 1800000
@@ -17,6 +19,11 @@ dataSource {
         testWhileIdle = true
         testOnReturn = true
         validationQuery = "/* ping */"  // Better than "SELECT 1"
+
+        dbProperties {
+            autoReconnect = false
+            connectTimeout = 60000
+        }
     }
 }
 
