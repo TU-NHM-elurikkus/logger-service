@@ -1,6 +1,5 @@
 package au.org.ala.logger.admin
 
-import au.org.ala.web.AlaSecured
 import groovy.json.JsonSlurper
 import org.springframework.http.HttpStatus
 import org.grails.plugins.csv.CSVWriter
@@ -8,7 +7,6 @@ import org.grails.plugins.csv.CSVWriter
 /**
  * Controller that supports the download of a user report for events
  */
-@AlaSecured(value = "ROLE_ADMIN", redirectController = 'logger', redirectAction = 'notAuthorised')
 class UserReportController {
 
     def loggerService

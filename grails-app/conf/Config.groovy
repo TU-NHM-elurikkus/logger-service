@@ -11,10 +11,8 @@ def appName = 'logger'
 
 default_config = "/data/${appName}/config/${appName}-config.properties"
 commons_config = "/data/commons/config/commons-config.properties"
-env_config = "conf/${Environment.current.name}/Config.groovy"
 
 grails.config.locations = [
-    "file:${env_config}",
     "file:${commons_config}",
     "file:${default_config}"
 ]
@@ -28,12 +26,9 @@ try {
     prop.load(new FileInputStream(fileLocation))
     rollbarServerKey = prop.getProperty("rollbar.postServerKey") ?: ""
 } catch(IOException e) {
-    e.printStackTrace()
+    // e.printStackTrace()
 }
 
-if(!new File(env_config).exists()) {
-    println "ERROR - [${appName}] Couldn't find environment specific configuration file: ${env_config}"
-}
 if(!new File(default_config).exists()) {
     println "ERROR - [${appName}] No external configuration file defined. ${default_config}"
 }
@@ -184,8 +179,8 @@ log4j = {
     root {
         // change the root logger to my tomcatLog file
         error "tomcatLog", "rollbar"
-        warn 'tomcatLog'
-        additivity = true
+        warn "tomcatLog"
+        info "stdout"
     }
 
     debug 'grails.app',
