@@ -463,7 +463,7 @@ class LoggerService {
             value = finder(id)
             if (!value) {
                 log.error("Failed to find value for ${id}")
-                throw new NoSuchFieldException()
+                throw new NoSuchFieldException("${id}")
             }
         }
         value
