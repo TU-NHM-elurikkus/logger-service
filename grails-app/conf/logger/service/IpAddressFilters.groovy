@@ -14,7 +14,7 @@ class IpAddressFilters {
     def loggerService
 
     def filters = {
-        all(controller: "logger", action: "save|monthlyBreakdown|getEventLog") {
+        all(controller: "logger", action: "save") {
             before = {
                 String ip = request.getHeader(X_FORWARDED_FOR) ?: request.getRemoteAddr()
 
